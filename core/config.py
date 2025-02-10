@@ -1,7 +1,6 @@
 import secrets
 
 from pydantic_settings import BaseSettings
-from dotenv import load_dotenv
 
 
 
@@ -13,12 +12,5 @@ class Settings(BaseSettings):
     SECRET_KEY: str = secrets.token_urlsafe(32)
     DEBUG: bool = False
     TESTING: bool = False
-
-    RENDER_SERVICE_ID: str  # Will be loaded from .env
-    RENDER_API_KEY: str  # Will be loaded from .env
-
-    class Config:
-        env_file = ".env"
-
 
 settings = Settings()
