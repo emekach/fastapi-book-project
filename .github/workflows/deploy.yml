@@ -1,4 +1,4 @@
-name: Deploy
+name: Continuous Deployment
 
 on:
   push:
@@ -10,9 +10,8 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v2
-
-      - name: Deploy to Render
+      - name: Trigger Render Deployment
         run: |
-          curl -fsSL https://api.render.com/deploy/srv-cul4sh3tq21c73bo64og?key=A0dbeiy0wq4 | bash
+          curl -X POST "https://api.render.com/v1/services/${{ secrets.RENDER_SERVICE_ID }}/deploys" \
+               -H "Authorization: Bearer ${{ secrets.RENDER_API_KEY }}" \
+               -H "Accept: application/json"
