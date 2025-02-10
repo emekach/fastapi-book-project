@@ -1,4 +1,4 @@
-name: Continuous Deployment
+name: Deploy
 
 on:
   push:
@@ -12,6 +12,6 @@ jobs:
     steps:
       - name: Trigger Render Deployment
         run: |
-          curl -X POST "https://api.render.com/v1/services/${{ secrets.RENDER_SERVICE_ID }}/deploys" \
+          curl -v -X POST "https://api.render.com/v1/services/${{ secrets.RENDER_SERVICE_ID }}/deploys" \
                -H "Authorization: Bearer ${{ secrets.RENDER_API_KEY }}" \
                -H "Accept: application/json"
