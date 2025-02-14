@@ -39,7 +39,7 @@ jobs:
           echo "Deploying to EC2..."
           echo "${{ secrets.SSH_PRIVATE_KEY }}" > /tmp/ssh_key.pem
           chmod 600 /tmp/ssh_key.pem
-          ssh -i /tmp/ssh_key.pem ec2-user@${{ secrets.EC2_PUBLIC_IP }} << 'EOF'
+          ssh -i /tmp/ssh_key.pem ubuntu@${{ secrets.EC2_PUBLIC_IP }} << 'EOF'
             cd /home/ubuntu/fastapi-book-project/
             git pull origin main  # Pull latest changes from the repository
             source venv/bin/activate  # Activate the virtual environment
