@@ -24,7 +24,14 @@ jobs:
           source venv/bin/activate
           pip install -r requirements.txt
 
-      - name: Deploy to EC2 (Assuming EC2 is set up with a GitHub Deploy Key or SSH)
+      - name: Deploy to EC2
         run: |
-          # Replace with deployment commands, e.g., copying code to EC2
-          ssh -i "flaskapi-book-project.pem" ec2-user@3.93.232.188  'cd /home/ubuntu/fastapi-book-project/ && git pull origin main && systemctl restart fastapi'
+          echo "Deploying to EC2..."
+          ssh -i "${{ secrets.SSH_PRIVATE_KEY  }}" ec2-user@${{ secrets.EC2_PUBLIC_IP }} << 'EOF'
+            cd /home/ubuntu/fastapi-book-project/
+            git pull origin main  # Pull latest changes
+            sudo systemctl restart fastapi  # Restart the FastAPI service
+          EOF
+        env:
+          EC2_IP: ${{ secrets.EC2_PUBLIC_IP}}
+          EC2_SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY  }}
