@@ -40,11 +40,22 @@ jobs:
           echo "${{ secrets.SSH_PRIVATE_KEY }}" > /tmp/ssh_key.pem
           chmod 600 /tmp/ssh_key.pem
           ssh -i /tmp/ssh_key.pem ubuntu@${{ secrets.EC2_PUBLIC_IP }} << 'EOF'
+            set -e  # Stop on any error
+            
+            # Navigate to project directory
             cd /home/ubuntu/fastapi-book-project/
-            git pull origin main  # Pull latest changes from the repository
-            source venv/bin/activate  # Activate the virtual environment
-            pip install -r requirements.txt  # Install dependencies
-            sudo systemctl restart fastapi  # Restart the FastAPI service
+            
+            # Pull latest changes
+            git fetch origin main
+            git reset --hard origin/main
+            
+            # Activate environment and install dependencies
+            source env/bin/activate
+            pip install -r requirements.txt
+            
+            # Restart the service
+            sudo systemctl daemon-reload
+            sudo systemctl restart fastapi
           EOF
         env:
           EC2_PUBLIC_IP: ${{ secrets.EC2_PUBLIC_IP }}
