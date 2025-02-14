@@ -1,17 +1,36 @@
-name: Deploy
+name: Deploy FastAPI Application
 
 on:
   push:
     branches:
-      - main
+      - main # This will trigger the CD pipeline when changes are pushed to the main branch.
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Trigger Render Deployment
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: "3"
+
+      - name: Install dependencies
         run: |
-          curl -v -X POST "https://api.render.com/v1/services/${{ secrets.RENDER_SERVICE_ID }}/deploys" \
-               -H "Authorization: Bearer ${{ secrets.RENDER_API_KEY }}" \
-               -H "Accept: application/json"
+          python -m venv venv
+          source venv/bin/activate
+          pip install -r requirements.txt
+
+      - name: Deploy to EC2
+        run: |
+          ssh -i flaskapi-book-project.pem ubuntu@3.93.232.188 <<EOF
+            cd /home/ubuntu/fastapi-book-project/
+            source venv/bin/activate
+            git pull origin main  # Pull the latest changes from the main branch
+            sudo systemctl restart fastapi  # Restart the FastAPI service to apply changes
+          EOF
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }} # This will be your private SSH key, saved in GitHub Secrets
+          EC2_PUBLIC_IP: ${{ secrets.EC2_PUBLIC_IP }} # Your EC2 public IP, saved in GitHub Secrets
